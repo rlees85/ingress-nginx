@@ -17,8 +17,8 @@ all: all-container
 
 # Use the 0.0 tag for testing, it shouldn't clobber any release builds
 TAG ?= 0.25.0
-REGISTRY ?= quay.io/kubernetes-ingress-controller
-DOCKER ?= docker
+REGISTRY ?= rlees85
+DOCKER ?= sudo docker
 SED_I ?= sed -i
 GOHOSTOS ?= $(shell go env GOHOSTOS)
 
@@ -205,7 +205,7 @@ release: all-container all-push
 
 .PHONY: check_dead_links
 check_dead_links:
-	@docker run -t \
+	@sudo docker run -t \
 	  -v $$PWD:/tmp aledbf/awesome_bot:0.1 \
 	  --allow-dupe \
 	  --allow-redirect $(shell find $$PWD -mindepth 1 -name "*.md" -printf '%P\n' | grep -v vendor | grep -v Changelog.md)
@@ -222,13 +222,13 @@ dev-env:
 
 .PHONY: live-docs
 live-docs:
-	@docker build --pull -t ingress-nginx/mkdocs build/mkdocs
-	@docker run --rm -it -p 3000:3000 -v ${PWD}:/docs ingress-nginx/mkdocs
+	@sudo docker build --pull -t ingress-nginx/mkdocs build/mkdocs
+	@sudo docker run --rm -it -p 3000:3000 -v ${PWD}:/docs ingress-nginx/mkdocs
 
 .PHONY: build-docs
 build-docs:
-	@docker build --pull -t ingress-nginx/mkdocs build/mkdocs
-	@docker run --rm -v ${PWD}:/docs ingress-nginx/mkdocs build
+	@sudo docker build --pull -t ingress-nginx/mkdocs build/mkdocs
+	@sudo docker run --rm -v ${PWD}:/docs ingress-nginx/mkdocs build
 
 .PHONY: misspell
 misspell:
