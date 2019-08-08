@@ -40,7 +40,7 @@ end
 
 describe("Sticky", function()
   before_each(function()
-    mock_ngx({ var = { location_path = "/", host = "test.com" } })
+    mock_ngx({ var = { location_path = "/" } })
   end)
 
   after_each(function()
@@ -82,7 +82,7 @@ describe("Sticky", function()
       cookie.new = mocked_cookie_new
     end)
 
-    context("when client doesn't have a cookie set and location is in cookie_locations", function()
+    context("when client doesn't have a cookie set", function()
       it("picks an endpoint for the client", function()
         local sticky_balancer_instance = sticky:new(test_backend)
         local peer = sticky_balancer_instance:balance()
@@ -106,10 +106,6 @@ describe("Sticky", function()
           s = spy.on(cookie_instance, "set")
           return cookie_instance, false
         end
-        local b = get_test_backend()
-        b.sessionAffinityConfig.cookieSessionAffinity.locations = {}
-        b.sessionAffinityConfig.cookieSessionAffinity.locations["test.com"] = {"/"}
-        local sticky_balancer_instance = sticky:new(b)
         assert.has_no.errors(function() sticky_balancer_instance:balance() end)
         assert.spy(s).was_called()
       end)
@@ -138,35 +134,6 @@ describe("Sticky", function()
         local sticky_balancer_instance = sticky:new(b)
         assert.has_no.errors(function() sticky_balancer_instance:balance() end)
         assert.spy(s).was_called()
-      end)
-    end)
-
-    context("when client doesn't have a cookie set and location not in cookie_locations", function()
-      it("picks an endpoint for the client", function()
-        local sticky_balancer_instance = sticky:new(test_backend)
-        local peer = sticky_balancer_instance:balance()
-        assert.equal(peer, test_backend_endpoint)
-      end)
-
-      it("does not set a cookie on the client", function()
-        local s = {}
-        cookie.new = function(self)
-          local cookie_instance = {
-            set = function(self, payload)
-              assert.equal(payload.key, test_backend.sessionAffinityConfig.cookieSessionAffinity.name)
-              assert.equal(payload.path, ngx.var.location_path)
-              assert.equal(payload.domain, ngx.var.host)
-              assert.equal(payload.httponly, true)
-              return true, nil
-            end,
-            get = function(k) return false end,
-          }
-          s = spy.on(cookie_instance, "set")
-          return cookie_instance, false
-        end
-        local sticky_balancer_instance = sticky:new(get_test_backend())
-        assert.has_no.errors(function() sticky_balancer_instance:balance() end)
-        assert.spy(s).was_not_called()
       end)
     end)
 

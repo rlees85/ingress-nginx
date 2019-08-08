@@ -296,41 +296,4 @@ var _ = framework.IngressNginxDescribe("Annotations - Affinity/Sticky Sessions",
 		Expect(err).ToNot(HaveOccurred())
 		Expect(logs).To(ContainSubstring(`session-cookie-path should be set when use-regex is true`))
 	})
-
-	It("should not set affinity across all server locations when using separate ingresses", func() {
-		host := "separate.foo.com"
-
-		annotations := map[string]string{
-			"nginx.ingress.kubernetes.io/affinity": "cookie",
-		}
-		ing1 := framework.NewSingleIngress("ingress1", "/foo/bar", host, f.Namespace, "http-svc", 80, &annotations)
-		f.EnsureIngress(ing1)
-
-		ing2 := framework.NewSingleIngress("ingress2", "/foo", host, f.Namespace, "http-svc", 80, &map[string]string{})
-		f.EnsureIngress(ing2)
-
-		f.WaitForNginxServer(host,
-			func(server string) bool {
-				return strings.Contains(server, `location /foo/bar`) && strings.Contains(server, `location /foo`)
-			})
-		time.Sleep(waitForLuaSync)
-
-		resp, _, errs := gorequest.New().
-			Get(f.GetURL(framework.HTTP)+"/foo").
-			Set("Host", host).
-			End()
-
-		Expect(errs).Should(BeEmpty())
-		Expect(resp.StatusCode).Should(Equal(http.StatusOK))
-		Expect(resp.Header.Get("Set-Cookie")).Should(Equal(""))
-
-		resp, _, errs = gorequest.New().
-			Get(f.GetURL(framework.HTTP)+"/foo/bar").
-			Set("Host", host).
-			End()
-
-		Expect(errs).Should(BeEmpty())
-		Expect(resp.StatusCode).Should(Equal(http.StatusOK))
-		Expect(resp.Header.Get("Set-Cookie")).Should(ContainSubstring("Path=/foo/bar"))
-	})
 })

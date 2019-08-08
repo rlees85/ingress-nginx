@@ -103,18 +103,7 @@ local function pick_new_upstream(self)
 end
 
 local function should_set_cookie(self)
-  if self.cookie_session_affinity.locations then
-    local locs = self.cookie_session_affinity.locations[ngx.var.host]
-    if locs ~= nil then
-      for _, path in pairs(locs) do
-        if ngx.var.location_path == path then
-          return true
-        end
-      end
-    end
-  end
-
-  return false
+  return true
 end
 
 function _M.balance(self)

@@ -113,18 +113,18 @@ In some cases, you may want to "canary" a new set of changes by sending a small 
 
 * `nginx.ingress.kubernetes.io/canary-by-header-value`: The header value to match for notifying the Ingress to route the request to the service specified in the Canary Ingress. When the request header is set to this value, it will be routed to the canary. For any other header value, the header will be ignored and the request compared against the other canary rules by precedence. This annotation has to be used together with . The annotation is an extension of the `nginx.ingress.kubernetes.io/canary-by-header` to allow customizing the header value instead of using hardcoded values. It doesn't have any effect if the `nginx.ingress.kubernetes.io/canary-by-header` annotation is not defined.
 
-* `nginx.ingress.kubernetes.io/canary-by-cookie`: The cookie to use for notifying the Ingress to route the request to the service specified in the Canary Ingress. When the cookie value is set to `always`, it will be routed to the canary. When the cookie is set to `never`, it will never be routed to the canary. For any other value, the cookie will be ignored and the request compared against the other canary rules by precedence. 
+* `nginx.ingress.kubernetes.io/canary-by-cookie`: The cookie to use for notifying the Ingress to route the request to the service specified in the Canary Ingress. When the cookie value is set to `always`, it will be routed to the canary. When the cookie is set to `never`, it will never be routed to the canary. For any other value, the cookie will be ignored and the request compared against the other canary rules by precedence.
 
 * `nginx.ingress.kubernetes.io/canary-weight`: The integer based (0 - 100) percent of random requests that should be routed to the service specified in the canary Ingress. A weight of 0 implies that no requests will be sent to the service in the Canary ingress by this canary rule. A weight of 100 means implies all requests will be sent to the alternative service specified in the Ingress.   
 
-Canary rules are evaluated in order of precedence. Precedence is as follows: 
-`canary-by-header -> canary-by-cookie -> canary-weight` 
+Canary rules are evaluated in order of precedence. Precedence is as follows:
+`canary-by-header -> canary-by-cookie -> canary-weight`
 
 **Note** that when you mark an ingress as canary, then all the other non-canary annotations will be ignored (inherited from the corresponding main ingress) except `nginx.ingress.kubernetes.io/load-balance` and `nginx.ingress.kubernetes.io/upstream-hash-by`.
 
 **Known Limitations**
 
-Currently a maximum of one canary ingress can be applied per Ingress rule. 
+Currently a maximum of one canary ingress can be applied per Ingress rule.
 
 ### Rewrite
 
@@ -140,9 +140,6 @@ If the Application Root is exposed in a different path and needs to be redirecte
 
 The annotation `nginx.ingress.kubernetes.io/affinity` enables and sets the affinity type in all Upstreams of an Ingress. This way, a request will always be directed to the same upstream server.
 The only affinity type available for NGINX is `cookie`.
-
-!!! attention
-    If more than one Ingress is defined for a host and at least one Ingress uses `nginx.ingress.kubernetes.io/affinity: cookie`, then only paths on the Ingress using `nginx.ingress.kubernetes.io/affinity` will use session cookie affinity. All paths defined on other Ingresses for the host will be load balanced through the random selection of a backend server. 
 
 !!! example
     Please check the [affinity](../../examples/affinity/cookie/README.md) example.
@@ -294,7 +291,7 @@ CORS can be controlled with the following annotations:
   Example: `nginx.ingress.kubernetes.io/cors-max-age: 600`
 
 !!! note
-    For more information please see [https://enable-cors.org](https://enable-cors.org/server_nginx.html) 
+    For more information please see [https://enable-cors.org](https://enable-cors.org/server_nginx.html)
 
 ### HTTP2 Push Preload.
 
@@ -327,11 +324,11 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
         set $agentflag 0;
-        
+
         if ($http_user_agent ~* "(Mobile)" ){
           set $agentflag 1;
         }
-        
+
         if ( $agentflag = 1 ) {
           return 301 https://m.example.com;
         }
@@ -681,7 +678,7 @@ of ingress locations. The ModSecurity module must first be enabled by enabling M
 [ConfigMap](./configmap.md#enable-modsecurity). Note this will enable ModSecurity for all paths, and each path
 must be disabled manually.
 
-It can be enabled using the following annotation: 
+It can be enabled using the following annotation:
 ```yaml
 nginx.ingress.kubernetes.io/enable-modsecurity: "true"
 ```
@@ -706,7 +703,7 @@ SecDebugLog /tmp/modsec_debug.log
 ```
 
 Note: If you use both `enable-owasp-core-rules` and `modsecurity-snippet` annotations together, only the
-`modsecurity-snippet` will take effect. If you wish to include the [OWASP Core Rule Set](https://www.modsecurity.org/CRS/Documentation/) or 
+`modsecurity-snippet` will take effect. If you wish to include the [OWASP Core Rule Set](https://www.modsecurity.org/CRS/Documentation/) or
 [recommended configuration](https://github.com/SpiderLabs/ModSecurity/blob/v3/master/modsecurity.conf-recommended) simply use the include
 statement:
 ```yaml
@@ -730,7 +727,7 @@ nginx.ingress.kubernetes.io/influxdb-server-name: "nginx-ingress"
 
 For the `influxdb-host` parameter you have two options:
 
-- Use an InfluxDB server configured with the  [UDP protocol](https://docs.influxdata.com/influxdb/v1.5/supported_protocols/udp/) enabled. 
+- Use an InfluxDB server configured with the  [UDP protocol](https://docs.influxdata.com/influxdb/v1.5/supported_protocols/udp/) enabled.
 - Deploy Telegraf as a sidecar proxy to the Ingress controller configured to listen UDP with the [socket listener input](https://github.com/influxdata/telegraf/tree/release-1.6/plugins/inputs/socket_listener) and to write using
 anyone of the [outputs plugins](https://github.com/influxdata/telegraf/tree/release-1.7/plugins/outputs) like InfluxDB, Apache Kafka,
 Prometheus, etc.. (recommended)
@@ -772,7 +769,7 @@ When this annotation is set to `true`, the case insensitive regular expression [
 
 Additionally, if the [`rewrite-target` annotation](#rewrite) is used on any Ingress for a given host, then the case insensitive regular expression [location modifier](https://nginx.org/en/docs/http/ngx_http_core_module.html#location) will be enforced on ALL paths for a given host regardless of what Ingress they are defined on.  
 
-Please read about [ingress path matching](../ingress-path-matching.md) before using this modifier. 
+Please read about [ingress path matching](../ingress-path-matching.md) before using this modifier.
 
 ### Satisfy
 
