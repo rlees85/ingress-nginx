@@ -45,4 +45,6 @@ sudo docker run --env "CGO_ENABLED=0"            \
                 -w "/go/k8s.io/ingress-nginx"    \
                 --rm -t -i golang make build
 
+export ARCH
+
 make container
